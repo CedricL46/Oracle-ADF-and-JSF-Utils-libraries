@@ -9,12 +9,12 @@ Since they aren't part of the framework core, we still need to manually add them
 Those librairies were firstly made available by their original author in the Oracle ADF Demo project.
 This repository is to make them easily accessible to everyone. 
 
-### I've also added my own functions to the libraries over the years.
+I've also added my own functions to the libraries over the years.
 Hope they'll be as useful to you as they've been to me and my clients.
 
 Looking for example on how to use those in your own Oracle ADF projects, find them here : https://cedricleruth.com/category/tutorials/oracle/oracleadf/
 
-## To use it in your ADF project : 
+### To use it in your ADF project : 
 
  1) In your ViewController projet, create 2 java class in a package "view.utils":
  
