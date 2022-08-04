@@ -464,7 +464,67 @@ public class ADFUtils {
         return iteratorVO;
     }
     
-        /**
+    /**
+     * Execute a validate and commit on the viewObject of a binding iterator
+     * The iterator name of a specific binding can be found in his PageDef.xml 
+     * (middle column named "Executables")
+     *
+     * @author Cedric Leruth <cedricleruth.com>
+     * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
+     * @return true if the validate and commit is succesful, false otherwise
+     */
+      public static boolean commitIterator(String iteratorName) {
+        boolean commitSuccessful = false;
+        ViewObject iteratorVO = getViewObjectFromIterator(iteratorName);
+        try {
+            iteratorVO.getApplicationModule().getTransaction().validate();
+            iteratorVO.getApplicationModule().getTransaction().commit();
+            commitSuccessful = true;
+        } catch (ValidationException validationException) {            
+            //Occurs if the data needing commit is invalid
+            //example: if a user enter a String in a NUMBER DB column
+            //The data isn't committed and you need to warn the user for him to fix this and retry
+            LOGGER.warning(validationException.getMessage());
+            //Warn the user
+        } catch (Exception exception) {
+            //Occurs if currentBindingEntry or iteratorBinding is null
+            //Usually if the iterator named iteratorName doesn't exist
+            LOGGER.severe(exception.getMessage());
+        }
+        return commitSuccessful;
+    }
+    
+    
+    /**
+     * Execute a rollback on the viewObject of a binding iterator
+     * The iterator name of a specific binding can be found in his PageDef.xml 
+     * (middle column named "Executables")
+     *
+     * @author Cedric Leruth <cedricleruth.com>
+     * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
+     * @return true if the rollback is succesful, false otherwise
+     */
+      public static boolean rollbackIterator(String iteratorName) {
+        boolean rollbackSuccessful = false;
+        ViewObject iteratorVO = getViewObjectFromIterator(iteratorName);
+        try {
+            iteratorVO.getApplicationModule().getTransaction().rollback();
+            rollbackSuccessful = true;
+        } catch (ValidationException validationException) {            
+            //Occurs if the data needing commit is invalid
+            //example: if a user enter a String in a NUMBER DB column
+            //The data isn't committed and you need to warn the user for him to fix this and retry
+            LOGGER.warning(validationException.getMessage());
+            //Warn the user
+        } catch (Exception exception) {
+            //Occurs if currentBindingEntry or iteratorBinding is null
+            //Usually if the iterator named iteratorName doesn't exist
+            LOGGER.severe(exception.getMessage());
+        }
+        return rollbackSuccessful;
+    }
+    
+     /**
      * How many lines return a specific Iterator without have to execute a SELECT COUNT
      *
      * How to use examples :
