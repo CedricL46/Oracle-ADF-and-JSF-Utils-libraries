@@ -2,6 +2,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.logging.Level;
+
 import javax.faces.model.SelectItem;
 
 import oracle.adf.model.BindingContext;
@@ -19,11 +21,16 @@ import oracle.jbo.ApplicationModule;
 import oracle.jbo.Key;
 import oracle.jbo.Row;
 import oracle.jbo.ValidationException;
+import oracle.jbo.VariableValueManager;
 import oracle.jbo.ViewCriteria;
 import oracle.jbo.ViewCriteriaManager;
 import oracle.jbo.ViewObject;
 import oracle.jbo.server.ViewObjectImpl;
 import oracle.jbo.uicli.binding.JUCtrlValueBinding;
+
+import view.commun._Logger;
+
+import view.navigation.plSqlBean;
 
 
 /**
@@ -164,7 +171,7 @@ public class ADFUtils {
 
     /**
      * Apply an existing view criteria to a view object based on it's iterator name
-     * 
+     *
      * How to use examples :
      * ViewObject vo = ADFUtils.applyViewCriteriaToIterator("YOUR_ITERATOR_NAME", "YOUR_VIEW_CRITERIA_NAME",true);
      * vo.executeQuery(); //to execute select with newly attached view criteria
@@ -188,10 +195,10 @@ public class ADFUtils {
         }
         return iteratorVO;
     }
-    
-     /**
+
+    /**
      * Remove an applied view criteria to a view object based on it's iterator name
-     * 
+     *
      * How to use examples :
      * ViewObject vo = ADFUtils.unApplyViewCriteriaOfIterator("YOUR_ITERATOR_NAME", "YOUR_VIEW_CRITERIA_NAME");
      * vo.executeQuery(); //to execute select with newly attached view criteria
@@ -213,10 +220,10 @@ public class ADFUtils {
         }
         return iteratorVO;
     }
-     
-     /**
+
+    /**
      * Remove an applied view criteria to a view object based on it's iterator name
-     * 
+     *
      * How to use examples :
      * ViewObject vo = ADFUtils.clearViewCriteriaOfIterator("YOUR_ITERATOR_NAME");
      * vo.executeQuery(); //to execute select with newly attached view criteria
@@ -228,7 +235,7 @@ public class ADFUtils {
     public static ViewObjectImpl clearViewCriteriaOfIterator(String iteratorName) {
         ViewObjectImpl iteratorVO = getViewObjectFromIterator(iteratorName);
         try {
-            ViewCriteriaManager viewCriteriaManager = iteratorVO.getViewCriteriaManager();            
+            ViewCriteriaManager viewCriteriaManager = iteratorVO.getViewCriteriaManager();
             viewCriteriaManager.clearViewCriterias();
         } catch (Exception exception) {
             //Occurs if viewCriteriaManager is null
@@ -236,6 +243,32 @@ public class ADFUtils {
             LOGGER.severe(exception.getMessage());
         }
         return iteratorVO;
+    }
+
+    /**
+     * Set Value of a View object bind variable
+     *
+     * How to use examples :
+     * ViewObject vo = ADFUtils.setVOBindVariableOfIterator("YOUR_ITERATOR_NAME", "YOUR_VARIABLE_NAME", "THE_VALUE_TO_SET");
+     * vo.executeQuery(); //to execute select with new bind variable value
+     * //or set view criteria 
+     *
+     * @author Cedric Leruth cedricleruth.com
+     * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
+     * @param bindVariableName Name of the bind variable to set
+     * @param bindVariableValue Value to set
+     * @return ViewObjectImpl or null if the param iteratorName doesn't exist
+     */
+    public static ViewObjectImpl setVOBindVariableOfIterator(String iteratorName, String bindVariableName, Object bindVariableValue) {
+        ViewObjectImpl iteratorViewObject = getViewObjectFromIterator(iteratorName);        
+        try {
+            VariableValueManager variableValueManager = iteratorViewObject.ensureVariableManager();
+            variableValueManager.setVariableValue(bindVariableName, bindVariableValue);
+        } catch (Exception exception) {
+            //Occurs if something is null, check if the parameters are correct
+            LOGGER.severe(exception.getMessage());
+        }
+        return iteratorViewObject;
     }
 
     /**
