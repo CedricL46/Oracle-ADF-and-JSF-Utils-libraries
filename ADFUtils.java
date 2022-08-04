@@ -437,6 +437,7 @@ public class ADFUtils {
      * (middle column named "Executables")
      * 
      * How to use examples : 
+     * ViewObject vo = ADFUtils.getViewObjectFromIterator("YOUR_ITERATOR_NAME");
      * vo.getCurrentRow() (Get the selected row values)
      * vo.reset();  vo.clearCache();
      * vo.executeQuery(); (execute the SELECT)
@@ -451,14 +452,40 @@ public class ADFUtils {
      */
     public static ViewObjectImpl getViewObjectFromIterator(String iteratorName) {
         ViewObjectImpl iteratorVO = null;
-        DCBindingContainer currentBindingEntry = (DCBindingContainer)BindingContext.getCurrent().getCurrentBindingsEntry();
-        if (currentBindingEntry != null) {
+        try {
+            DCBindingContainer currentBindingEntry = (DCBindingContainer) BindingContext.getCurrent().getCurrentBindingsEntry();
             DCIteratorBinding iteratorBinding = currentBindingEntry.findIteratorBinding(iteratorName);
-            if (iteratorBinding != null) {
-                iteratorVO = (ViewObjectImpl)iteratorBinding.getViewObject();
-            }
+            iteratorVO = (ViewObjectImpl) iteratorBinding.getViewObject();
+        } catch (Exception exception) {
+            //Occurs if currentBindingEntry or iteratorBinding is null
+            //Usually if the iterator named iteratorName doesn't exist
+            LOGGER.severe(exception.getMessage());
         }
         return iteratorVO;
+    }
+    
+        /**
+     * How many lines return a specific Iterator without have to execute a SELECT COUNT
+     *
+     * How to use examples :
+     * long val = ADFUtils.getIteratorEstimatedRowCount("YOUR_ITERATOR_NAME")
+     *
+     * @author Cedric Leruth <cedricleruth.com>
+     * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
+     * @return long 0 or How many lines return a specific Iterator without have to execute a SELECT COUNT
+     */
+    public static long getIteratorEstimatedRowCount(String iteratorName) {
+        long iteratorRowCount = 0;
+        try {
+            DCBindingContainer currentBindingEntry = (DCBindingContainer) BindingContext.getCurrent().getCurrentBindingsEntry();
+            DCIteratorBinding iteratorBinding = currentBindingEntry.findIteratorBinding(iteratorName);
+            iteratorRowCount = iteratorBinding.getEstimatedRowCount();
+        } catch (Exception exception) {
+            //Occurs if currentBindingEntry or iteratorBinding is null
+            //Usually if the iterator named iteratorName doesn't exist
+            LOGGER.severe(exception.getMessage());
+        }
+        return iteratorRowCount;
     }
     
 }
