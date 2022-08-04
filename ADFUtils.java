@@ -154,7 +154,7 @@ public class ADFUtils {
      * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
      * @return long 0 or How many lines return a specific Iterator without have to execute a SELECT COUNT
      */
-    public static long getIteratorEstimatedRowCount(String iteratorName) {
+    public static long getIteratorRowCount(String iteratorName) {
         long iteratorRowCount = 0;
         try {
             DCBindingContainer currentBindingEntry = (DCBindingContainer) BindingContext.getCurrent().getCurrentBindingsEntry();
