@@ -30,8 +30,6 @@ import oracle.jbo.uicli.binding.JUCtrlValueBinding;
 
 import view.commun._Logger;
 
-import view.navigation.plSqlBean;
-
 
 /**
  * A series of convenience functions for dealing with ADF Bindings.
@@ -251,7 +249,7 @@ public class ADFUtils {
      * How to use examples :
      * ViewObject vo = ADFUtils.setVOBindVariableOfIterator("YOUR_ITERATOR_NAME", "YOUR_VARIABLE_NAME", "THE_VALUE_TO_SET");
      * vo.executeQuery(); //to execute select with new bind variable value
-     * //or set view criteria 
+     * //or set view criteria
      *
      * @author Cedric Leruth cedricleruth.com
      * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
@@ -260,7 +258,7 @@ public class ADFUtils {
      * @return ViewObjectImpl or null if the param iteratorName doesn't exist
      */
     public static ViewObjectImpl setVOBindVariableOfIterator(String iteratorName, String bindVariableName, Object bindVariableValue) {
-        ViewObjectImpl iteratorViewObject = getViewObjectFromIterator(iteratorName);        
+        ViewObjectImpl iteratorViewObject = getViewObjectFromIterator(iteratorName);
         try {
             VariableValueManager variableValueManager = iteratorViewObject.ensureVariableManager();
             variableValueManager.setVariableValue(bindVariableName, bindVariableValue);
@@ -269,6 +267,49 @@ public class ADFUtils {
             LOGGER.severe(exception.getMessage());
         }
         return iteratorViewObject;
+    }
+
+    /**
+     * Get Selected row with all attributes values
+     *
+     * @author Cedric Leruth cedricleruth.com
+     * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
+     * @return Row or null if the param iteratorName doesn't exist
+     */
+    public static Row getCurrentRowOfIterator(String iteratorName) {
+        Row currentRow = null;
+        try {
+            BindingContext bindingContext = BindingContext.getCurrent();
+            DCBindingContainer bindingContainer = (DCBindingContainer) bindingContext.getCurrentBindingsEntry();
+            DCIteratorBinding iteratorBinding = bindingContainer.findIteratorBinding(iteratorName);
+            currentRow = iteratorBinding.getCurrentRow();
+        } catch (Exception exception) {
+            //Occurs if something is null, check if the parameters are correct
+            LOGGER.severe(exception.getMessage());
+        }
+        return currentRow;
+    }
+
+    /**
+     * Get Selected row specific attribute value
+     *
+     * @author Cedric Leruth cedricleruth.com
+     * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
+     * @return Object value of the attribute in the selected row or null if the param iteratorName doesn't exist
+     */
+    public static Object getCurrentRowAttributeValueOfIterator(String iteratorName, String AttributeName) {
+        Object attributeValue = null;
+        try {
+            BindingContext bindingContext = BindingContext.getCurrent();
+            DCBindingContainer bindingContainer = (DCBindingContainer) bindingContext.getCurrentBindingsEntry();
+            DCIteratorBinding iteratorBinding = bindingContainer.findIteratorBinding(iteratorName);
+            Row currentRow = iteratorBinding.getCurrentRow();
+            attributeValue = currentRow.getAttribute(AttributeName);
+        } catch (Exception exception) {
+            //Occurs if something is null, check if the parameters are correct
+            LOGGER.severe(exception.getMessage());
+        }
+        return attributeValue;
     }
 
     /**
