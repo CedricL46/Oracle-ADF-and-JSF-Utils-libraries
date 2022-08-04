@@ -26,14 +26,14 @@ import oracle.jbo.uicli.binding.JUCtrlValueBinding;
 
 /**
  * A series of convenience functions for dealing with ADF Bindings.
- * 
+ *
  * Original authors:
  * @author Duncan Mills
  * @author Steve Muench
- * 
+ *
  */
 public class ADFUtils {
-    
+
     public static final ADFLogger LOGGER = ADFLogger.createADFLogger(ADFUtils.class);
 
     /**
@@ -42,8 +42,7 @@ public class ADFUtils {
      * @return ApplicationModule
      */
     public static ApplicationModule getApplicationModuleForDataControl(String name) {
-        return (ApplicationModule)JSFUtils.resolveExpression("#{data." + name + 
-                                                             ".dataProvider}");
+        return (ApplicationModule) JSFUtils.resolveExpression("#{data." + name + ".dataProvider}");
     }
 
     /**
@@ -62,8 +61,7 @@ public class ADFUtils {
      * @param attributeName of the bound value in the pageDef
      * @param value to set
      */
-    public static void setBoundAttributeValue(String attributeName, 
-                                              Object value) {
+    public static void setBoundAttributeValue(String attributeName, Object value) {
         findControlBinding(attributeName).setInputValue(value);
     }
 
@@ -73,11 +71,9 @@ public class ADFUtils {
      * @param parameterName name of the pagedef parameter
      * @return evaluated value of the parameter as a String
      */
-    public static Object getPageDefParameterValue(String pageDefName, 
-                                                  String parameterName) {
+    public static Object getPageDefParameterValue(String pageDefName, String parameterName) {
         BindingContainer bindings = findBindingContainer(pageDefName);
-        DCParameter param = 
-            ((DCBindingContainer)bindings).findParameter(parameterName);
+        DCParameter param = ((DCBindingContainer) bindings).findParameter(parameterName);
         return param.getValue();
     }
 
@@ -89,14 +85,12 @@ public class ADFUtils {
      * @return the control value binding with the name passed in.
      *
      */
-    public static AttributeBinding findControlBinding(BindingContainer bindingContainer, 
-                                                      String attributeName) {
+    public static AttributeBinding findControlBinding(BindingContainer bindingContainer, String attributeName) {
         if (attributeName != null) {
             if (bindingContainer != null) {
-                ControlBinding ctrlBinding = 
-                    bindingContainer.getControlBinding(attributeName);
+                ControlBinding ctrlBinding = bindingContainer.getControlBinding(attributeName);
                 if (ctrlBinding instanceof AttributeBinding) {
-                    return (AttributeBinding)ctrlBinding;
+                    return (AttributeBinding) ctrlBinding;
                 }
             }
         }
@@ -119,7 +113,7 @@ public class ADFUtils {
      * @return the current page's binding container
      */
     public static BindingContainer getBindingContainer() {
-        return (BindingContainer)JSFUtils.resolveExpression("#{bindings}");
+        return (BindingContainer) JSFUtils.resolveExpression("#{bindings}");
     }
 
     /**
@@ -127,46 +121,38 @@ public class ADFUtils {
      * @return current binding container as a DCBindingContainer
      */
     public static DCBindingContainer getDCBindingContainer() {
-        return (DCBindingContainer)getBindingContainer();
+        return (DCBindingContainer) getBindingContainer();
     }
 
     /**
      * Get List of ADF Faces SelectItem for an iterator binding.
-     * 
+     *
      * Uses the value of the 'valueAttrName' attribute as the key for
      * the SelectItem key.
-     * 
+     *
      * @param iteratorName ADF iterator binding name
      * @param valueAttrName name of the value attribute to use
      * @param displayAttrName name of the attribute from iterator rows to display
      * @return ADF Faces SelectItem for an iterator binding
      */
-    public static List<SelectItem> selectItemsForIterator(String iteratorName, 
-                                                          String valueAttrName, 
-                                                          String displayAttrName) {
-        return selectItemsForIterator(findIterator(iteratorName), 
-                                      valueAttrName, displayAttrName);
+    public static List<SelectItem> selectItemsForIterator(String iteratorName, String valueAttrName, String displayAttrName) {
+        return selectItemsForIterator(findIterator(iteratorName), valueAttrName, displayAttrName);
     }
 
     /**
      * Get List of ADF Faces SelectItem for an iterator binding with description.
-     * 
+     *
      * Uses the value of the 'valueAttrName' attribute as the key for
      * the SelectItem key.
-     * 
+     *
      * @param iteratorName ADF iterator binding name
      * @param valueAttrName name of the value attribute to use
      * @param displayAttrName name of the attribute from iterator rows to display
      * @param descriptionAttrName name of the attribute to use for description
      * @return ADF Faces SelectItem for an iterator binding with description
      */
-    public static List<SelectItem> selectItemsForIterator(String iteratorName, 
-                                                          String valueAttrName, 
-                                                          String displayAttrName, 
-                                                          String descriptionAttrName) {
-        return selectItemsForIterator(findIterator(iteratorName), 
-                                      valueAttrName, displayAttrName, 
-                                      descriptionAttrName);
+    public static List<SelectItem> selectItemsForIterator(String iteratorName, String valueAttrName, String displayAttrName, String descriptionAttrName) {
+        return selectItemsForIterator(findIterator(iteratorName), valueAttrName, displayAttrName, descriptionAttrName);
     }
 
     /**
@@ -175,10 +161,8 @@ public class ADFUtils {
      * @param valueAttrName value attribute to use
      * @return List of attribute values for an iterator
      */
-    public static List attributeListForIterator(String iteratorName, 
-                                                String valueAttrName) {
-        return attributeListForIterator(findIterator(iteratorName), 
-                                        valueAttrName);
+    public static List attributeListForIterator(String iteratorName, String valueAttrName) {
+        return attributeListForIterator(findIterator(iteratorName), valueAttrName);
     }
 
     /**
@@ -209,20 +193,18 @@ public class ADFUtils {
      * @param keyAttrName name of key attribute to use
      * @return List of Key objects for rows
      */
-    public static List<Key> keyAttrListForIterator(String iteratorName, 
-                                                   String keyAttrName) {
+    public static List<Key> keyAttrListForIterator(String iteratorName, String keyAttrName) {
         return keyAttrListForIterator(findIterator(iteratorName), keyAttrName);
     }
 
     /**
      * Get List of Key objects for rows in an iterator using key attribute.
-     * 
+     *
      * @param iter iterator binding
      * @param keyAttrName name of key attribute to use
      * @return List of Key objects for rows
      */
-    public static List<Key> keyAttrListForIterator(DCIteratorBinding iter, 
-                                                   String keyAttrName) {
+    public static List<Key> keyAttrListForIterator(DCIteratorBinding iter, String keyAttrName) {
         List<Key> attributeList = new ArrayList<Key>();
         for (Row r : iter.getAllRowsInRange()) {
             attributeList.add(new Key(new Object[] { r.getAttribute(keyAttrName) }));
@@ -232,13 +214,12 @@ public class ADFUtils {
 
     /**
      * Get a List of attribute values for an iterator.
-     * 
+     *
      * @param iter iterator binding
      * @param valueAttrName name of value attribute to use
      * @return List of attribute values
      */
-    public static List attributeListForIterator(DCIteratorBinding iter, 
-                                                String valueAttrName) {
+    public static List attributeListForIterator(DCIteratorBinding iter, String valueAttrName) {
         List attributeList = new ArrayList();
         for (Row r : iter.getAllRowsInRange()) {
             attributeList.add(r.getAttribute(valueAttrName));
@@ -248,13 +229,12 @@ public class ADFUtils {
 
     /**
      * Find an iterator binding in the current binding container by name.
-     * 
+     *
      * @param name iterator binding name
      * @return iterator binding
      */
     public static DCIteratorBinding findIterator(String name) {
-        DCIteratorBinding iter = 
-            getDCBindingContainer().findIteratorBinding(name);
+        DCIteratorBinding iter = getDCBindingContainer().findIteratorBinding(name);
         if (iter == null) {
             throw new RuntimeException("Iterator '" + name + "' not found");
         }
@@ -267,11 +247,9 @@ public class ADFUtils {
      * @return
      */
     public static DCIteratorBinding findIterator(String bindingContainer, String iterator) {
-        DCBindingContainer bindings = 
-            (DCBindingContainer)JSFUtils.resolveExpression("#{" + bindingContainer + "}");
+        DCBindingContainer bindings = (DCBindingContainer) JSFUtils.resolveExpression("#{" + bindingContainer + "}");
         if (bindings == null) {
-            throw new RuntimeException("Binding container '" + 
-                                       bindingContainer + "' not found");
+            throw new RuntimeException("Binding container '" + bindingContainer + "' not found");
         }
         DCIteratorBinding iter = bindings.findIteratorBinding(iterator);
         if (iter == null) {
@@ -284,9 +262,8 @@ public class ADFUtils {
      * @param name
      * @return
      */
-    public static JUCtrlValueBinding findCtrlBinding(String name){
-        JUCtrlValueBinding rowBinding = 
-            (JUCtrlValueBinding)getDCBindingContainer().findCtrlBinding(name);    
+    public static JUCtrlValueBinding findCtrlBinding(String name) {
+        JUCtrlValueBinding rowBinding = (JUCtrlValueBinding) getDCBindingContainer().findCtrlBinding(name);
         if (rowBinding == null) {
             throw new RuntimeException("CtrlBinding " + name + "' not found");
         }
@@ -295,13 +272,12 @@ public class ADFUtils {
 
     /**
      * Find an operation binding in the current binding container by name.
-     * 
+     *
      * @param name operation binding name
      * @return operation binding
      */
     public static OperationBinding findOperation(String name) {
-        OperationBinding op = 
-            getDCBindingContainer().getOperationBinding(name);
+        OperationBinding op = getDCBindingContainer().getOperationBinding(name);
         if (op == null) {
             throw new RuntimeException("Operation '" + name + "' not found");
         }
@@ -310,21 +286,17 @@ public class ADFUtils {
 
     /**
      * Find an operation binding in the current binding container by name.
-     * 
+     *
      * @param bindingContianer binding container name
      * @param opName operation binding name
      * @return operation binding
      */
-    public static OperationBinding findOperation(String bindingContianer, 
-                                                 String opName) {
-        DCBindingContainer bindings = 
-            (DCBindingContainer)JSFUtils.resolveExpression("#{" + bindingContianer + "}");
+    public static OperationBinding findOperation(String bindingContianer, String opName) {
+        DCBindingContainer bindings = (DCBindingContainer) JSFUtils.resolveExpression("#{" + bindingContianer + "}");
         if (bindings == null) {
-            throw new RuntimeException("Binding container '" + 
-                                       bindingContianer + "' not found");
+            throw new RuntimeException("Binding container '" + bindingContianer + "' not found");
         }
-        OperationBinding op = 
-            bindings.getOperationBinding(opName);
+        OperationBinding op = bindings.getOperationBinding(opName);
         if (op == null) {
             throw new RuntimeException("Operation '" + opName + "' not found");
         }
@@ -333,121 +305,101 @@ public class ADFUtils {
 
     /**
      * Get List of ADF Faces SelectItem for an iterator binding with description.
-     * 
+     *
      * Uses the value of the 'valueAttrName' attribute as the key for
      * the SelectItem key.
-     * 
+     *
      * @param iter ADF iterator binding
      * @param valueAttrName name of value attribute to use for key
      * @param displayAttrName name of the attribute from iterator rows to display
      * @param descriptionAttrName name of the attribute for description
      * @return ADF Faces SelectItem for an iterator binding with description
      */
-    public static List<SelectItem> selectItemsForIterator(DCIteratorBinding iter, 
-                                                          String valueAttrName, 
-                                                          String displayAttrName, 
-                                                          String descriptionAttrName) {
+    public static List<SelectItem> selectItemsForIterator(DCIteratorBinding iter, String valueAttrName, String displayAttrName, String descriptionAttrName) {
         List<SelectItem> selectItems = new ArrayList<SelectItem>();
         for (Row r : iter.getAllRowsInRange()) {
-            selectItems.add(new SelectItem(r.getAttribute(valueAttrName), 
-                                           (String)r.getAttribute(displayAttrName), 
-                                           (String)r.getAttribute(descriptionAttrName)));
+            selectItems.add(new SelectItem(r.getAttribute(valueAttrName), (String) r.getAttribute(displayAttrName), (String) r.getAttribute(descriptionAttrName)));
         }
         return selectItems;
     }
 
     /**
      * Get List of ADF Faces SelectItem for an iterator binding.
-     * 
+     *
      * Uses the value of the 'valueAttrName' attribute as the key for
      * the SelectItem key.
-     * 
+     *
      * @param iter ADF iterator binding
      * @param valueAttrName name of value attribute to use for key
      * @param displayAttrName name of the attribute from iterator rows to display
      * @return ADF Faces SelectItem for an iterator binding
      */
-    public static List<SelectItem> selectItemsForIterator(DCIteratorBinding iter, 
-                                                          String valueAttrName, 
-                                                          String displayAttrName) {
+    public static List<SelectItem> selectItemsForIterator(DCIteratorBinding iter, String valueAttrName, String displayAttrName) {
         List<SelectItem> selectItems = new ArrayList<SelectItem>();
         for (Row r : iter.getAllRowsInRange()) {
-            selectItems.add(new SelectItem(r.getAttribute(valueAttrName), 
-                                           (String)r.getAttribute(displayAttrName)));
+            selectItems.add(new SelectItem(r.getAttribute(valueAttrName), (String) r.getAttribute(displayAttrName)));
         }
         return selectItems;
     }
 
     /**
      * Get List of ADF Faces SelectItem for an iterator binding.
-     * 
+     *
      * Uses the rowKey of each row as the SelectItem key.
-     * 
+     *
      * @param iteratorName ADF iterator binding name
      * @param displayAttrName name of the attribute from iterator rows to display
      * @return ADF Faces SelectItem for an iterator binding
      */
-    public static List<SelectItem> selectItemsByKeyForIterator(String iteratorName, 
-                                                               String displayAttrName) {
-        return selectItemsByKeyForIterator(findIterator(iteratorName), 
-                                           displayAttrName);
+    public static List<SelectItem> selectItemsByKeyForIterator(String iteratorName, String displayAttrName) {
+        return selectItemsByKeyForIterator(findIterator(iteratorName), displayAttrName);
     }
 
     /**
      * Get List of ADF Faces SelectItem for an iterator binding with discription.
-     * 
+     *
      * Uses the rowKey of each row as the SelectItem key.
-     * 
+     *
      * @param iteratorName ADF iterator binding name
      * @param displayAttrName name of the attribute from iterator rows to display
      * @param descriptionAttrName name of the attribute for description
      * @return ADF Faces SelectItem for an iterator binding with discription
      */
-    public static List<SelectItem> selectItemsByKeyForIterator(String iteratorName, 
-                                                               String displayAttrName, 
-                                                               String descriptionAttrName) {
-        return selectItemsByKeyForIterator(findIterator(iteratorName), 
-                                           displayAttrName, 
-                                           descriptionAttrName);
+    public static List<SelectItem> selectItemsByKeyForIterator(String iteratorName, String displayAttrName, String descriptionAttrName) {
+        return selectItemsByKeyForIterator(findIterator(iteratorName), displayAttrName, descriptionAttrName);
     }
 
     /**
      * Get List of ADF Faces SelectItem for an iterator binding with discription.
-     * 
+     *
      * Uses the rowKey of each row as the SelectItem key.
-     * 
+     *
      * @param iter ADF iterator binding
      * @param displayAttrName name of the attribute from iterator rows to display
      * @param descriptionAttrName name of the attribute for description
      * @return ADF Faces SelectItem for an iterator binding with discription
      */
-    public static List<SelectItem> selectItemsByKeyForIterator(DCIteratorBinding iter, 
-                                                               String displayAttrName, 
-                                                               String descriptionAttrName) {
+    public static List<SelectItem> selectItemsByKeyForIterator(DCIteratorBinding iter, String displayAttrName, String descriptionAttrName) {
         List<SelectItem> selectItems = new ArrayList<SelectItem>();
         for (Row r : iter.getAllRowsInRange()) {
-            selectItems.add(new SelectItem(r.getKey(), 
-                                           (String)r.getAttribute(displayAttrName), 
-                                           (String)r.getAttribute(descriptionAttrName)));
+            selectItems.add(new SelectItem(r.getKey(), (String) r.getAttribute(displayAttrName), (String) r.getAttribute(descriptionAttrName)));
         }
         return selectItems;
     }
 
     /**
      * Get List of ADF Faces SelectItem for an iterator binding.
-     * 
+     *
      * Uses the rowKey of each row as the SelectItem key.
-     * 
+     *
      * @param iter ADF iterator binding
      * @param displayAttrName name of the attribute from iterator rows to display
      * @return List of ADF Faces SelectItem for an iterator binding
      */
-    public static List<SelectItem> selectItemsByKeyForIterator(DCIteratorBinding iter, 
-                                                               String displayAttrName) {
+    public static List<SelectItem> selectItemsByKeyForIterator(DCIteratorBinding iter, String displayAttrName) {
         List<SelectItem> selectItems = new ArrayList<SelectItem>();
         for (Row r : iter.getAllRowsInRange()) {
-            selectItems.add(new SelectItem(r.getKey(), 
-                                           (String)r.getAttribute(displayAttrName)));
+            selectItems.add(new SelectItem(r.getKey(), (String) r.getAttribute(displayAttrName)));
         }
         return selectItems;
     }
@@ -464,18 +416,17 @@ public class ADFUtils {
      */
     private static BindingContainer findBindingContainer(String pageDefName) {
         BindingContext bctx = getDCBindingContainer().getBindingContext();
-        BindingContainer foundContainer = 
-            bctx.findBindingContainer(pageDefName);
+        BindingContainer foundContainer = bctx.findBindingContainer(pageDefName);
         return foundContainer;
     }
 
     /**
      * @param opList
      */
-    public static void printOperationBindingExceptions(List opList){
-        if(opList != null && !opList.isEmpty()){
-            for(Object error:opList){
-                LOGGER.severe( error.toString() );
+    public static void printOperationBindingExceptions(List opList) {
+        if (opList != null && !opList.isEmpty()) {
+            for (Object error : opList) {
+                LOGGER.severe(error.toString());
             }
         }
     }
