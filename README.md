@@ -1,5 +1,5 @@
 # Oracle-ADF-and-JSF-Utils-libraries
-General useful static utilities functions for Oracle ADF and JSF
+ADFUtils and JSFUtils are two libraries of must use functions to use in Oracle ADF applications.
 
 Original library authors are : Duncan Mills, Steve Muench and Ric Smith.
 They were last updated in 2007.
