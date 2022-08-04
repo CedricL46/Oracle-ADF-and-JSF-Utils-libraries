@@ -19,13 +19,15 @@ import oracle.jbo.ApplicationModule;
 import oracle.jbo.Key;
 import oracle.jbo.Row;
 import oracle.jbo.ValidationException;
+import oracle.jbo.ViewCriteria;
+import oracle.jbo.ViewCriteriaManager;
 import oracle.jbo.ViewObject;
 import oracle.jbo.server.ViewObjectImpl;
 import oracle.jbo.uicli.binding.JUCtrlValueBinding;
 
 
 /**
- * A series of useful Oracle ADF functions
+ * A series of convenience functions for dealing with ADF Bindings.
  *
  * @author Duncan Mills
  * @author Steve Muench
@@ -34,15 +36,15 @@ import oracle.jbo.uicli.binding.JUCtrlValueBinding;
  */
 public class ADFUtils {
 
-    public static final ADFLogger LOGGER = ADFLogger.createADFLogger(ADFUtils.class);    
-    
-    
-     /**
+    public static final ADFLogger LOGGER = ADFLogger.createADFLogger(ADFUtils.class);
+
+
+    /**
      * Function to get the ViewOject implementation for the iterator name
-     * The iterator name of a specific binding can be found in his PageDef.xml 
+     * The iterator name of a specific binding can be found in his PageDef.xml
      * (middle column named "Executables")
-     * 
-     * How to use examples : 
+     *
+     * How to use examples :
      * ViewObject vo = ADFUtils.getViewObjectFromIterator("YOUR_ITERATOR_NAME");
      * vo.getCurrentRow() (Get the selected row values)
      * vo.reset();  vo.clearCache();
@@ -69,24 +71,28 @@ public class ADFUtils {
         }
         return iteratorVO;
     }
-    
+
     /**
      * Execute a validate and commit on the viewObject of a binding iterator
-     * The iterator name of a specific binding can be found in his PageDef.xml 
+     * The iterator name of a specific binding can be found in his PageDef.xml
      * (middle column named "Executables")
      *
      * @author Cedric Leruth cedricleruth.com
      * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
      * @return true if the validate and commit is succesful, false otherwise
      */
-      public static boolean commitIterator(String iteratorName) {
+    public static boolean commitIterator(String iteratorName) {
         boolean commitSuccessful = false;
         ViewObject iteratorVO = getViewObjectFromIterator(iteratorName);
         try {
-            iteratorVO.getApplicationModule().getTransaction().validate();
-            iteratorVO.getApplicationModule().getTransaction().commit();
+            iteratorVO.getApplicationModule()
+                      .getTransaction()
+                      .validate();
+            iteratorVO.getApplicationModule()
+                      .getTransaction()
+                      .commit();
             commitSuccessful = true;
-        } catch (ValidationException validationException) {            
+        } catch (ValidationException validationException) {
             //Occurs if the data needing commit is invalid
             //example: if a user enter a String in a NUMBER DB column
             //The data isn't committed and you need to warn the user for him to fix this and retry
@@ -99,24 +105,26 @@ public class ADFUtils {
         }
         return commitSuccessful;
     }
-    
-    
+
+
     /**
      * Execute a rollback on the viewObject of a binding iterator
-     * The iterator name of a specific binding can be found in his PageDef.xml 
+     * The iterator name of a specific binding can be found in his PageDef.xml
      * (middle column named "Executables")
      *
      * @author Cedric Leruth cedricleruth.com
      * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
      * @return true if the rollback is succesful, false otherwise
      */
-      public static boolean rollbackIterator(String iteratorName) {
+    public static boolean rollbackIterator(String iteratorName) {
         boolean rollbackSuccessful = false;
         ViewObject iteratorVO = getViewObjectFromIterator(iteratorName);
         try {
-            iteratorVO.getApplicationModule().getTransaction().rollback();
+            iteratorVO.getApplicationModule()
+                      .getTransaction()
+                      .rollback();
             rollbackSuccessful = true;
-        } catch (ValidationException validationException) {            
+        } catch (ValidationException validationException) {
             //Occurs if the data needing commit is invalid
             //example: if a user enter a String in a NUMBER DB column
             //The data isn't committed and you need to warn the user for him to fix this and retry
@@ -129,8 +137,8 @@ public class ADFUtils {
         }
         return rollbackSuccessful;
     }
-    
-     /**
+
+    /**
      * How many lines return a specific Iterator without have to execute a SELECT COUNT
      *
      * How to use examples :
@@ -152,6 +160,82 @@ public class ADFUtils {
             LOGGER.severe(exception.getMessage());
         }
         return iteratorRowCount;
+    }
+
+    /**
+     * Apply an existing view criteria to a view object based on it's iterator name
+     * 
+     * How to use examples :
+     * ViewObject vo = ADFUtils.applyViewCriteriaToIterator("YOUR_ITERATOR_NAME", "YOUR_VIEW_CRITERIA_NAME",true);
+     * vo.executeQuery(); //to execute select with newly attached view criteria
+     *
+     * @author Cedric Leruth cedricleruth.com
+     * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
+     * @param viewCriteriaName Name of the view criteria to apply (Need to be defined in the View Object)
+     * @param keepOtherAppliedViewCriteria will apply on top of other view criteria if true and will remove other view criteria if false
+     * @return ViewObjectImpl or null if the param iteratorName doesn't exist
+     */
+    public static ViewObjectImpl applyViewCriteriaOfIterator(String iteratorName, String viewCriteriaName, boolean keepOtherAppliedViewCriteria) {
+        ViewObjectImpl iteratorVO = getViewObjectFromIterator(iteratorName);
+        try {
+            ViewCriteriaManager viewCriteriaManager = iteratorVO.getViewCriteriaManager();
+            ViewCriteria viewCriteria = viewCriteriaManager.getViewCriteria(viewCriteriaName);
+            iteratorVO.applyViewCriteria(viewCriteria, keepOtherAppliedViewCriteria);
+        } catch (Exception exception) {
+            //Occurs if viewCriteriaManager or viewCriteria is null
+            //Usually if the iterator named iteratorName or if the viewCriteriaName doesn't exist
+            LOGGER.severe(exception.getMessage());
+        }
+        return iteratorVO;
+    }
+    
+     /**
+     * Remove an applied view criteria to a view object based on it's iterator name
+     * 
+     * How to use examples :
+     * ViewObject vo = ADFUtils.unApplyViewCriteriaOfIterator("YOUR_ITERATOR_NAME", "YOUR_VIEW_CRITERIA_NAME");
+     * vo.executeQuery(); //to execute select with newly attached view criteria
+     *
+     * @author Cedric Leruth cedricleruth.com
+     * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
+     * @param viewCriteriaName Name of the view criteria to apply (Need to be defined in the View Object)
+     * @return ViewObjectImpl or null if the param iteratorName doesn't exist
+     */
+    public static ViewObjectImpl unApplyViewCriteriaOfIterator(String iteratorName, String viewCriteriaName) {
+        ViewObjectImpl iteratorVO = getViewObjectFromIterator(iteratorName);
+        try {
+            ViewCriteriaManager viewCriteriaManager = iteratorVO.getViewCriteriaManager();
+            viewCriteriaManager.removeApplyViewCriteriaName(viewCriteriaName);
+        } catch (Exception exception) {
+            //Occurs if viewCriteriaManager or viewCriteria is null
+            //Usually if the iterator named iteratorName or if the viewCriteriaName doesn't exist
+            LOGGER.severe(exception.getMessage());
+        }
+        return iteratorVO;
+    }
+     
+     /**
+     * Remove an applied view criteria to a view object based on it's iterator name
+     * 
+     * How to use examples :
+     * ViewObject vo = ADFUtils.clearViewCriteriaOfIterator("YOUR_ITERATOR_NAME");
+     * vo.executeQuery(); //to execute select with newly attached view criteria
+     *
+     * @author Cedric Leruth cedricleruth.com
+     * @param iteratorName The iterator name of a specific binding can be found in his PageDef.xml
+     * @return ViewObjectImpl or null if the param iteratorName doesn't exist
+     */
+    public static ViewObjectImpl clearViewCriteriaOfIterator(String iteratorName) {
+        ViewObjectImpl iteratorVO = getViewObjectFromIterator(iteratorName);
+        try {
+            ViewCriteriaManager viewCriteriaManager = iteratorVO.getViewCriteriaManager();            
+            viewCriteriaManager.clearViewCriterias();
+        } catch (Exception exception) {
+            //Occurs if viewCriteriaManager is null
+            //Usually if the iterator named iteratorName doesn't exist
+            LOGGER.severe(exception.getMessage());
+        }
+        return iteratorVO;
     }
 
     /**
@@ -606,5 +690,5 @@ public class ADFUtils {
             }
         }
     }
-    
+
 }
