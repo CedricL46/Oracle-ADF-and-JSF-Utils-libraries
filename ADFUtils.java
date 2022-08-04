@@ -1,8 +1,9 @@
 
+import java.sql.CallableStatement;
+import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import java.util.logging.Level;
 
 import javax.faces.model.SelectItem;
 
@@ -25,10 +26,10 @@ import oracle.jbo.VariableValueManager;
 import oracle.jbo.ViewCriteria;
 import oracle.jbo.ViewCriteriaManager;
 import oracle.jbo.ViewObject;
+import oracle.jbo.server.ApplicationModuleImpl;
+import oracle.jbo.server.DBTransaction;
 import oracle.jbo.server.ViewObjectImpl;
 import oracle.jbo.uicli.binding.JUCtrlValueBinding;
-
-import view.commun._Logger;
 
 
 /**
@@ -310,6 +311,54 @@ public class ADFUtils {
             LOGGER.severe(exception.getMessage());
         }
         return attributeValue;
+    }
+
+    /**
+     * Run an existing plsql function using a transaction from you dataControl
+     *
+     * Example :
+     * String plReturnVarchar = ADFUtils.callStoredFunction(Types.VARCHAR, "YOUR_PL_PKG.YOUR_PL_FUNCTION (?, ?)", new Object[] { YOUR_VAR_1, YOUR_VAR_2 }, "YOUR_DATA_CONTROL_AMDataControl");
+     * or with 3 parameters
+     * String plReturnVarchar = ADFUtils.callStoredFunction(Types.VARCHAR, "YOUR_PL_PKG.YOUR_PL_FUNCTION (?, ?, ?)", new Object[] { YOUR_VAR_1, YOUR_VAR_2, YOUR_VAR_3 }, "YOUR_DATA_CONTROL_AMDataControl");
+     *
+     * @author Cedric Leruth cedricleruth.com
+     * @param sqlReturnType
+     * @param functionName your plsql package and function with (?) for each parameter (see examples)
+     * @param paramValues and Object array with 1 child per parameter
+     * @param dataControlName the name of your dataControl that you can find in the PageDef.xml of your bindings
+     * @return Object return values of your plsql or null if error
+     */
+    public static Object callStoredPlSqlFunction(int sqlReturnType, String functionName, Object[] paramValues, String dataControlName) {
+        Object plReturn = null;
+        DBTransaction transaction = null;
+        CallableStatement statement = null;
+        try {
+            ApplicationModuleImpl am = (ApplicationModuleImpl) getApplicationModuleForDataControl(dataControlName);
+            transaction = am.getDBTransaction();
+            statement = transaction.createCallableStatement("begin ? := " + functionName + ";end;", 0);
+            statement.registerOutParameter(1, sqlReturnType);
+            if (paramValues != null) {
+                for (int z = 0; z < paramValues.length; z++) {
+                    statement.setObject(z + 2, paramValues[z]);
+                }
+            }
+            statement.executeUpdate();
+            plReturn = statement.getObject(1);
+        } catch (SQLException sqe) {
+            LOGGER.severe(sqe.getMessage());
+        } catch (Exception exception) {
+            //Occurs if something is null, check if the parameters are correct
+            LOGGER.severe(exception.getMessage());
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (Exception exception) {
+                    LOGGER.severe(exception.getMessage());
+                }
+            }
+        }
+        return plReturn;
     }
 
     /**
