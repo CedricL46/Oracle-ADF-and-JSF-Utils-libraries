@@ -430,4 +430,35 @@ public class ADFUtils {
             }
         }
     }
+    
+     /**
+     * Function to get the ViewOject implementation for the iterator name
+     * The iterator name of a specific binding can be found in his PageDef.xml 
+     * (middle column named "Executables")
+     * 
+     * How to use examples : 
+     * vo.getCurrentRow() (Get the selected row values)
+     * vo.reset();  vo.clearCache();
+     * vo.executeQuery(); (execute the SELECT)
+     * boolean isNotSaved = vo.getApplicationModule().getTransaction().isDirty(); (TRUE if need to be commited or rollback)
+     * vo.getApplicationModule().getTransaction().validate(); (Validate if all fields are ok)
+     * vo.getApplicationModule().getTransaction().commit(); (Commit to DB)
+     * vo.getApplicationModule().getTransaction().rollback(); (Rollback to DB)
+     *
+     * @author Cedric Leruth <cedricleruth.com>
+     * @param iteratorName (The iterator name of a specific binding can be found in his PageDef.xml)
+     * @return ViewObjectImpl or null if the param iteratorName doesn't exist
+     */
+    public static ViewObjectImpl getViewObjectFromIterator(String iteratorName) {
+        ViewObjectImpl iteratorVO = null;
+        DCBindingContainer currentBindingEntry = (DCBindingContainer)BindingContext.getCurrent().getCurrentBindingsEntry();
+        if (currentBindingEntry != null) {
+            DCIteratorBinding iteratorBinding = currentBindingEntry.findIteratorBinding(iteratorName);
+            if (iteratorBinding != null) {
+                iteratorVO = (ViewObjectImpl)iteratorBinding.getViewObject();
+            }
+        }
+        return iteratorVO;
+    }
+    
 }
