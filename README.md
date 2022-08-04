@@ -23,3 +23,20 @@ I've also added my own functions to the libraries over the years.
 Hope they'll be as useful to you as they've been to me and my clients.
 
 Looking for example on how to use those in your own Oracle ADF projects, find them here : https://cedricleruth.com/category/tutorials/oracle/oracleadf/
+
+To use it in your ADF project : 
+
+ 1) In your ViewController projet, create 2 java class in a package "view.utils":
+ 
+     a) Name one of the java class ADFUtils.java
+     
+     b) Name the second java class JSFUtils.java
+     
+ 2) Copy the content of this JSFUtils into your newly created JSFUtils.java
+ 
+ 3) Copy the content of this ADFUtils into your newly created ADFUtils.java
+ 
+ 4) Add an "import view.utils.JSFUtils;" at the top of your ADFUtils.java file (Is often done automatically by JDeveloper)
+ 
+ 5) You can now use those functions in all your java beans in your ViewController project
+    
